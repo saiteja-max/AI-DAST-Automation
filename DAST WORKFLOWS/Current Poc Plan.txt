@@ -1,0 +1,207 @@
+WORKFLOW_DEFINITION:
+  name: "Autonomous DAST Security Scanner"
+  version: "1.0-MVP"
+  mode: "Fully Agentic"
+  
+  INITIALIZATION:
+    - step: "System Bootstrap"
+      agent: "Agent Manager"
+      actions:
+        - Initialize LLM connection
+        - Load agent configurations dynamically
+        - Establish RAG database connection
+        - Verify ZAP availability
+        - Create workflow session ID
+    
+    - step: "Agent Spawning"
+      agent: "Agent Manager"
+      actions:
+        - Spawn all required agents
+        - Establish communication channels
+        - Set up monitoring
+        - Initialize health checks
+  
+  PHASE_1_RECONNAISSANCE:
+    - step: "Target Analysis"
+      agent: "Agent Manager -> Recon Agent"
+      llm_decision: "Determine reconnaissance strategy based on target"
+      actions:
+        - Parse target URL/domain
+        - Identify target type (web app, API, etc.)
+        - Determine reconnaissance scope
+        - Select data sources dynamically
+    
+    - step: "Subdomain Enumeration"
+      agent: "Recon Agent"
+      parallel: true
+      actions:
+        - Query DNS records
+        - Search Certificate Transparency logs
+        - Check Wayback Machine
+        - Perform search engine dorking
+        - Aggregate and deduplicate results
+        - Store in RAG: "discoveries.subdomains"
+    
+    - step: "URL Discovery"
+      agent: "Recon Agent"
+      parallel: true
+      actions:
+        - Fetch URLs from Wayback Machine
+        - Extract URLs from Common Crawl
+        - Discover endpoints from JS files
+        - Identify API endpoints
+        - Store in RAG: "discoveries.urls"
+    
+    - step: "Technology Identification"
+      agent: "Recon Agent"
+      actions:
+        - Analyze HTTP headers
+        - Identify frameworks and libraries
+        - Detect CMS platforms
+        - Fingerprint services
+        - Store in RAG: "discoveries.technologies"
+    
+    - step: "Reconnaissance Summary"
+      agent: "Agent Manager"
+      llm_decision: "Analyze recon results and plan next phase"
+      actions:
+        - Query RAG for all discoveries
+        - Generate attack surface map
+        - Prioritize targets for scanning
+        - Update workflow strategy
+  
+  PHASE_2_SCANNING_PREPARATION:
+    - step: "Context Creation"
+      agent: "Agent Manager -> ZAP Agent"
+      llm_decision: "Design scanning strategy based on recon"
+      actions:
+        - Create ZAP contexts for each target
+        - Configure authentication if needed
+        - Set up session management
+        - Define scope boundaries
+    
+    - step: "Scan Policy Generation"
+      agent: "ZAP Agent"
+      llm_powered: true
+      actions:
+        - Query RAG for technology stack
+        - Generate custom scan policies using LLM
+        - Configure attack vectors based on target
+        - Set rate limits dynamically
+        - Store policies in RAG: "scan.policies"
+  
+  PHASE_3_ACTIVE_SCANNING:
+    - step: "Spider/Crawl"
+      agent: "ZAP Agent"
+      parallel: true
+      actions:
+        - Execute traditional spider
+        - Run AJAX spider for JS apps
+        - Discover hidden directories
+        - Map application structure
+        - Store in RAG: "scan.crawl_results"
+    
+    - step: "Passive Scanning"
+      agent: "ZAP Agent"
+      continuous: true
+      actions:
+        - Analyze all proxied traffic
+        - Identify security headers issues
+        - Detect information disclosure
+        - Find insecure cookies
+        - Store in RAG: "vulnerabilities.passive"
+    
+    - step: "Active Scanning"
+      agent: "ZAP Agent"
+      llm_controlled: true
+      actions:
+        - Execute scan with generated policies
+        - Adapt scanning based on responses
+        - Handle rate limiting dynamically
+        - Detect and bypass WAFs if needed
+        - Store in RAG: "vulnerabilities.active"
+    
+    - step: "Targeted Testing"
+      agent: "Agent Manager -> ZAP Agent"
+      llm_decision: "Identify high-value targets for deep testing"
+      actions:
+        - Query RAG for interesting findings
+        - Generate targeted test cases using LLM
+        - Execute focused security tests
+        - Validate potential vulnerabilities
+        - Store in RAG: "vulnerabilities.validated"
+  
+  PHASE_4_ANALYSIS:
+    - step: "Finding Aggregation"
+      agent: "Agent Manager"
+      actions:
+        - Query all findings from RAG
+        - Deduplicate across scan types
+        - Correlate related vulnerabilities
+        - Calculate severity scores
+    
+    - step: "Intelligence Analysis"
+      agent: "Agent Manager"
+      llm_powered: true
+      actions:
+        - Analyze attack patterns
+        - Identify vulnerability chains
+        - Predict potential impacts
+        - Generate exploitation scenarios
+        - Store in RAG: "analysis.intelligence"
+    
+    - step: "Risk Assessment"
+      agent: "Agent Manager"
+      llm_powered: true
+      actions:
+        - Calculate business impact
+        - Assess exploitability
+        - Determine risk ratings
+        - Prioritize remediation
+        - Store in RAG: "analysis.risk"
+  
+  PHASE_5_REPORTING:
+    - step: "Report Generation"
+      agent: "Reporting Agent"
+      llm_powered: true
+      actions:
+        - Query complete scan data from RAG
+        - Generate executive summary using LLM
+        - Create technical details section
+        - Produce remediation guidance
+        - Generate compliance mappings
+    
+    - step: "Report Formatting"
+      agent: "Reporting Agent"
+      actions:
+        - Create HTML interactive report
+        - Generate PDF document
+        - Export JSON for integrations
+        - Create developer-friendly Markdown
+        - Store in RAG: "reports.final"
+    
+    - step: "Knowledge Update"
+      agent: "RAG Agent"
+      actions:
+        - Update vulnerability patterns
+        - Store successful test cases
+        - Record false positives
+        - Update decision history
+        - Optimize for future scans
+  
+  FINALIZATION:
+    - step: "Cleanup"
+      agent: "Agent Manager"
+      actions:
+        - Clean up ZAP sessions
+        - Archive scan data
+        - Update metrics
+        - Generate audit log
+    
+    - step: "Continuous Learning"
+      agent: "Agent Manager -> RAG Agent"
+      actions:
+        - Analyze scan effectiveness
+        - Update agent strategies
+        - Refine LLM prompts
+        - Store lessons learned
