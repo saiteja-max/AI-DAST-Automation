@@ -1,0 +1,411 @@
+WORKFLOW_DEFINITION:
+  name: "Autonomous DAST Security Scanner - Enhanced"
+  version: "2.0-FULL"
+  mode: "Fully Agentic with Self-Learning"
+  
+  INITIALIZATION:
+    - step: "System Bootstrap"
+      agent: "Agent Manager"
+      actions:
+        - Initialize Llama-4-Maverick-17B connection
+        - Load dynamic agent configurations
+        - Establish RAG vector database
+        - Verify OWASP ZAP availability
+        - Load security knowledge base
+        - Create unique workflow session
+        - Initialize tool registry (pip packages)
+    
+    - step: "Dynamic Tool Installation"
+      agent: "Agent Manager"
+      llm_decision: "Determine required tools based on target profile"
+      actions:
+        - pip install dnspython
+        - pip install python-whois
+        - pip install beautifulsoup4
+        - pip install requests
+        - pip install python-nmap
+        - pip install pycvesearch
+        - pip install jsbeautifier
+        - Setup custom scripts
+    
+    - step: "Agent Orchestration"
+      agent: "Agent Manager"
+      actions:
+        - Spawn all autonomous agents
+        - Establish inter-agent communication
+        - Setup event-driven messaging
+        - Initialize agent health monitoring
+        - Create decision tree framework
+  
+  PHASE_1_RECONNAISSANCE:
+    - step: "Target Intelligence Gathering"
+      agent: "Agent Manager -> Recon Agent"
+      llm_decision: "Analyze target and design reconnaissance strategy"
+      actions:
+        - Parse and validate target(s)
+        - Identify target characteristics
+        - Query RAG for historical data
+        - Define reconnaissance boundaries
+        - Select optimal data sources
+    
+    - step: "Subdomain Enumeration"
+      agent: "Recon Agent"
+      parallel: true
+      llm_guided: true
+      actions:
+        - DNS enumeration (A, AAAA, CNAME, MX, TXT)
+        - Certificate Transparency logs analysis
+        - Wayback Machine subdomain extraction
+        - Search engine dorking (Google, Bing, DuckDuckGo)
+        - Permutation generation based on patterns
+        - Wildcard detection and handling
+        - Virtual host discovery
+        - Store in RAG: "recon.subdomains"
+    
+    - step: "Subdomain Takeover Analysis"
+      agent: "Recon Agent"
+      priority: "HIGH"
+      actions:
+        - Check CNAME records for all subdomains
+        - Identify dangling DNS entries
+        - Detect orphaned cloud resources (AWS, Azure, GCP)
+        - Check for vulnerable services (GitHub Pages, Heroku, etc.)
+        - Validate takeover possibilities
+        - Generate proof-of-concept for vulnerables
+        - Store in RAG: "vulnerabilities.subdomain_takeover"
+    
+    - step: "Port Scanning & Service Discovery"
+      agent: "Recon Agent"
+      llm_decision: "Determine scanning strategy based on target size"
+      actions:
+        - Intelligent port selection (top ports + custom)
+        - TCP/UDP scanning with rate limiting
+        - Service version detection
+        - OS fingerprinting
+        - Identify HTTP/HTTPS services on non-standard ports
+        - SSL/TLS certificate analysis
+        - Banner grabbing
+        - Store in RAG: "recon.services"
+    
+    - step: "Asset Discovery & Mapping"
+      agent: "Recon Agent"
+      parallel: true
+      actions:
+        - Wayback Machine URL extraction
+        - Common Crawl data mining
+        - GitHub/GitLab/Bitbucket reconnaissance
+        - Social media footprint analysis
+        - Cloud storage bucket discovery
+        - API endpoint enumeration from documentation
+        - Store in RAG: "recon.assets"
+    
+    - step: "Technology Stack Profiling"
+      agent: "Recon Agent"
+      llm_enhanced: true
+      actions:
+        - HTTP header analysis
+        - Framework/library detection
+        - CMS identification and versioning
+        - Web server fingerprinting
+        - Programming language detection
+        - Database type inference
+        - CDN and WAF detection
+        - Store in RAG: "recon.technologies"
+  
+  PHASE_2_JAVASCRIPT_ANALYSIS:
+    - step: "JavaScript File Discovery"
+      agent: "Recon Agent"
+      actions:
+        - Extract JS files from HTML pages
+        - Identify webpack bundles
+        - Find source maps
+        - Discover third-party scripts
+        - Download and cache all JS files
+        - Store in RAG: "recon.javascript_files"
+    
+    - step: "JS Static Analysis"
+      agent: "Recon Agent"
+      llm_powered: true
+      actions:
+        - Beautify and deobfuscate JS code
+        - Extract API endpoints and routes
+        - Find hardcoded credentials/tokens
+        - Identify sensitive configuration data
+        - Discover hidden functionality
+        - Extract GraphQL/REST schemas
+        - Find AWS S3 buckets and keys
+        - Detect vulnerable dependencies
+        - Store in RAG: "recon.js_analysis"
+    
+    - step: "API Endpoint Mapping"
+      agent: "Recon Agent -> RAG Agent"
+      actions:
+        - Consolidate discovered endpoints
+        - Identify authentication mechanisms
+        - Map API versioning schemes
+        - Detect rate limiting patterns
+        - Generate API interaction map
+        - Store in RAG: "recon.api_endpoints"
+  
+  PHASE_3_VULNERABILITY_ASSESSMENT:
+    - step: "CVE Scanning"
+      agent: "Recon Agent"
+      llm_decision: "Prioritize CVE checks based on detected technologies"
+      actions:
+        - Query CVE databases for identified versions
+        - Check for publicly known exploits
+        - Assess patch status
+        - Calculate CVSS scores
+        - Identify exploit chains
+        - Store in RAG: "vulnerabilities.cves"
+    
+    - step: "Misconfiguration Detection"
+      agent: "Recon Agent -> ZAP Agent"
+      comprehensive: true
+      actions:
+        - Security headers analysis
+        - CORS policy evaluation
+        - Directory listing detection
+        - Default credentials checking
+        - Backup file discovery (.bak, .old, .swp)
+        - Git/SVN exposure detection
+        - Cloud metadata endpoint access
+        - Database exposure checking
+        - Admin panel discovery
+        - Debug mode detection
+        - Store in RAG: "vulnerabilities.misconfigurations"
+    
+    - step: "Information Disclosure Assessment"
+      agent: "ZAP Agent"
+      actions:
+        - Error message analysis
+        - Stack trace detection
+        - Version disclosure identification
+        - Internal IP leakage
+        - Username enumeration
+        - Path disclosure vulnerabilities
+        - Source code disclosure
+        - Store in RAG: "vulnerabilities.info_disclosure"
+  
+  PHASE_4_INTELLIGENT_SCANNING:
+    - step: "Context Initialization"
+      agent: "Agent Manager -> ZAP Agent"
+      llm_decision: "Create optimal scanning contexts based on discoveries"
+      actions:
+        - Create ZAP contexts per subdomain/service
+        - Configure authentication methods dynamically
+        - Setup session handling rules
+        - Define scope inclusion/exclusion
+        - Configure technology-specific rules
+        - Store in RAG: "scan.contexts"
+    
+    - step: "Advanced Crawling Strategy"
+      agent: "ZAP Agent"
+      llm_controlled: true
+      actions:
+        - Query RAG for all discovered URLs
+        - Prioritize crawling based on attack surface
+        - Configure form filling strategies
+        - Set up authentication state management
+        - Define crawl depth dynamically
+        - Prepare JavaScript rendering options
+    
+    - step: "Intelligent Active Crawling"
+      agent: "ZAP Agent"
+      enhanced: true
+      actions:
+        - Traditional spidering with smart depth
+        - AJAX spider for SPA applications
+        - Form detection and intelligent filling
+          * Email fields: contextual test emails
+          * Phone fields: valid format numbers
+          * Date fields: past/future dates
+          * Text fields: context-aware strings
+          * File uploads: safe test files
+        - Multi-step form handling
+        - CAPTCHA detection and flagging
+        - Dynamic parameter learning
+        - State-aware navigation
+        - Store in RAG: "scan.crawl_map"
+    
+    - step: "Smart Fuzzing"
+      agent: "ZAP Agent"
+      llm_guided: true
+      actions:
+        - Generate context-aware payloads
+        - Adaptive payload mutation
+        - Response-based payload refinement
+        - Encoding/decoding strategies
+        - WAF bypass techniques
+        - Rate limit evasion
+        - Store in RAG: "scan.fuzzing_results"
+    
+    - step: "Passive Scanning Enhancement"
+      agent: "ZAP Agent"
+      continuous: true
+      actions:
+        - All traffic analysis
+        - Cookie security assessment
+        - Session management flaws
+        - Cryptographic weakness detection
+        - Privacy violation detection
+        - Compliance issue identification
+        - Store in RAG: "vulnerabilities.passive_enhanced"
+    
+    - step: "Active Vulnerability Scanning"
+      agent: "ZAP Agent"
+      llm_orchestrated: true
+      actions:
+        - SQL Injection (all variants)
+        - XSS (reflected, stored, DOM-based)
+        - XXE injection
+        - SSRF detection
+        - Command injection
+        - Path traversal
+        - LDAP/NoSQL injection
+        - Template injection
+        - Deserialization attacks
+        - Business logic flaws
+        - Race conditions
+        - Store in RAG: "vulnerabilities.active_enhanced"
+    
+    - step: "API Security Testing"
+      agent: "ZAP Agent"
+      specialized: true
+      actions:
+        - REST API fuzzing
+        - GraphQL introspection and testing
+        - SOAP service testing
+        - WebSocket security assessment
+        - JWT token analysis
+        - OAuth flow testing
+        - Rate limiting bypass attempts
+        - Store in RAG: "vulnerabilities.api_security"
+  
+  PHASE_5_ADVANCED_ANALYSIS:
+    - step: "Vulnerability Correlation"
+      agent: "Agent Manager"
+      llm_powered: true
+      actions:
+        - Query all findings from RAG
+        - Identify vulnerability chains
+        - Detect attack path possibilities
+        - Calculate combined impact
+        - Determine root causes
+        - Store in RAG: "analysis.correlation"
+    
+    - step: "False Positive Reduction"
+      agent: "Agent Manager"
+      llm_decision: "Validate and verify findings"
+      actions:
+        - Replay suspicious requests
+        - Validate with alternative payloads
+        - Check business logic context
+        - Verify against known false positive patterns
+        - Manual verification triggers
+        - Store in RAG: "analysis.validated"
+    
+    - step: "Exploit Feasibility Analysis"
+      agent: "Agent Manager"
+      llm_enhanced: true
+      actions:
+        - Assess real-world exploitability
+        - Generate proof-of-concept code
+        - Calculate attack complexity
+        - Determine required privileges
+        - Evaluate defense mechanisms
+        - Store in RAG: "analysis.exploitability"
+    
+    - step: "Business Impact Assessment"
+      agent: "Agent Manager"
+      llm_powered: true
+      actions:
+        - Map vulnerabilities to business assets
+        - Calculate data exposure risk
+        - Assess compliance violations
+        - Determine reputation impact
+        - Estimate financial implications
+        - Store in RAG: "analysis.business_impact"
+  
+  PHASE_6_INTELLIGENT_REPORTING:
+    - step: "Report Intelligence Gathering"
+      agent: "Reporting Agent"
+      actions:
+        - Query complete scan data from RAG
+        - Aggregate all findings
+        - Collect evidence and screenshots
+        - Gather remediation resources
+        - Compile metrics and statistics
+    
+    - step: "AI-Powered Report Generation"
+      agent: "Reporting Agent"
+      llm_powered: true
+      actions:
+        - Generate executive summary with key risks
+        - Create technical deep-dive sections
+        - Produce remediation roadmap
+        - Generate code-level fix suggestions
+        - Create compliance mapping (OWASP, PCI, etc.)
+        - Develop security improvement recommendations
+        - Store in RAG: "reports.content"
+    
+    - step: "Multi-Format Report Creation"
+      agent: "Reporting Agent"
+      actions:
+        - Interactive HTML dashboard
+        - Detailed PDF report
+        - JSON for SIEM integration
+        - CSV for issue tracking
+        - Markdown for wikis
+        - SARIF for IDE integration
+        - Store in RAG: "reports.final"
+  
+  PHASE_7_CONTINUOUS_IMPROVEMENT:
+    - step: "Learning Extraction"
+      agent: "RAG Agent"
+      actions:
+        - Analyze scan effectiveness metrics
+        - Identify new attack patterns
+        - Record successful bypass techniques
+        - Document false positive patterns
+        - Update vulnerability signatures
+    
+    - step: "Knowledge Base Enhancement"
+      agent: "Agent Manager -> RAG Agent"
+      actions:
+        - Update attack playbooks
+        - Refine LLM prompts
+        - Optimize agent strategies
+        - Enhance decision trees
+        - Improve payload databases
+        - Store in RAG: "knowledge.enhanced"
+    
+    - step: "System Evolution"
+      agent: "Agent Manager"
+      autonomous: true
+      actions:
+        - Self-optimize scanning parameters
+        - Adjust agent collaboration patterns
+        - Refine vulnerability detection rules
+        - Enhance report generation templates
+        - Update tool configurations
+    
+  FINALIZATION:
+    - step: "Cleanup & Archival"
+      agent: "Agent Manager"
+      actions:
+        - Clean ZAP sessions and contexts
+        - Archive scan artifacts
+        - Compress and store evidence
+        - Generate audit trail
+        - Update scan history
+        - Calculate performance metrics
+    
+    - step: "Readiness Update"
+      agent: "All Agents"
+      actions:
+        - Update agent capabilities
+        - Refresh tool configurations
+        - Reload enhanced knowledge base
+        - Prepare for next scan
+        - System health check
